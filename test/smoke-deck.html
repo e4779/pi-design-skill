@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Smoke: deck_stage</title>
+  <script src="../starters/deck_stage.js"></script>
+  <style>
+    body { margin: 0; background: #000; }
+    section {
+      font-family: Georgia, 'Times New Roman', serif;
+      padding: 80px;
+      box-sizing: border-box;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    h1 { font-size: 120px; margin: 0 0 24px; letter-spacing: -0.02em; line-height: 1; font-weight: 500; }
+    p  { font-size: 32px; margin: 0; opacity: 0.75; max-width: 1200px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <deck-stage width="1920" height="1080">
+    <section style="background: #faf7f2; color: #1a1a1a;">
+      <h1>One</h1>
+      <p>First slide of the smoke deck. Keyboard navigation should move forward.</p>
+    </section>
+    <section style="background: #f4e4d7; color: #1a1a1a;">
+      <h1>Two</h1>
+      <p>Second slide. Overlay in the corner shows 2/3.</p>
+    </section>
+    <section style="background: #4a5d2e; color: #fff;">
+      <h1>Three</h1>
+      <p>Final slide. Home key returns to one.</p>
+    </section>
+  </deck-stage>
+  <script type="application/json" id="speaker-notes">
+[
+  "Opening note: introduce the smoke test.",
+  "Middle note: demonstrate state transition.",
+  "Closing note: wrap it up."
+]
+  </script>
+</body>
+</html>

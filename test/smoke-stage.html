@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Smoke: Stage / Sprite / scrubber</title>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script src="../starters/animations.jsx" type="text/babel"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Georgia, 'Iowan Old Style', serif; background: #000; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const stageStyles = {
+      hero: {
+        position: 'absolute', inset: 0,
+        display: 'flex', flexDirection: 'column',
+        justifyContent: 'center', alignItems: 'center',
+        background: 'linear-gradient(180deg, #fef9f3 0%, #f3e5cd 100%)',
+        color: '#1a1a1a',
+        padding: '0 120px',
+      },
+      eyebrow: {
+        font: '400 22px ui-monospace, Menlo, Consolas, monospace',
+        letterSpacing: '0.18em', textTransform: 'uppercase',
+        color: '#9a6a2e', marginBottom: 28,
+      },
+      big: {
+        font: '500 180px/1 Georgia, serif',
+        letterSpacing: '-0.035em', margin: 0,
+        textAlign: 'center',
+      },
+      sub: {
+        font: '400 34px/1.4 Georgia, serif',
+        color: '#4a4035', maxWidth: 1100,
+        marginTop: 36, textAlign: 'center',
+      },
+      chip: {
+        display: 'inline-block',
+        padding: '12px 24px',
+        border: '2px solid #1a1a1a',
+        borderRadius: 100,
+        font: '400 20px Georgia, serif',
+      },
+      bar: (color) => ({
+        width: 6, height: 360,
+        background: color,
+        position: 'absolute', top: 360,
+      }),
+    };
+
+    function Scene() {
+      // Hook usage inside Stage — reads the shared clock for free
+      const t = useTime();
+
+      // Dynamic blend color driven by stage time via interpolate()
+      const wash = interpolate(
+        t,
+        [0, 1500, 3500, 5000],
+        ['#fef9f3', '#f3d8a8', '#d6ad6b', '#8a5a22'],
+        { easing: Easing.inOutCubic }
+      );
+
+      return (
+        <div style={{ ...stageStyles.hero, background: wash }}>
+          <FadeIn start={0} duration={500}>
+            <div style={stageStyles.eyebrow}>Animations / Stage + Sprite</div>
+          </FadeIn>
+
+          <Reveal start={200} duration={700} from="bottom" distance={60}>
+            <h1 style={stageStyles.big}>In&nbsp;motion.</h1>
+          </Reveal>
+
+          <Reveal start={700} duration={700} from="bottom" distance={40}>
+            <p style={stageStyles.sub}>
+              Remotion-compatible in-browser timeline. Stage owns the clock; Sprite renders between
+              its start and end; hooks expose local-t; the scrubber below lets you seek.
+            </p>
+          </Reveal>
+
+          <ScaleIn start={1200} duration={500} from={0.8}>
+            <div style={{ ...stageStyles.chip, marginTop: 48 }}>Scrub to explore</div>
+          </ScaleIn>
+
+          <Sprite start={2500} end={5000} easing={Easing.inOutCubic}>
+            {(local) => (
+              <div style={{
+                position: 'absolute',
+                left: `calc(${12 + local * 76}% - 3px)`,
+                ...stageStyles.bar('#8a5a22'),
+                opacity: 0.2 + local * 0.6,
+              }}/>
+            )}
+          </Sprite>
+        </div>
+      );
+    }
+
+    function App() {
+      return (
+        <Stage duration={5000} width={1920} height={1080} loop={true}>
+          <Scene/>
+        </Stage>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+  </script>
+</body>
+</html>

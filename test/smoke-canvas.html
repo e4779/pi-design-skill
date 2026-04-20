@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Smoke: design_canvas + device_frame + animations</title>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script src="../starters/design_canvas.jsx" type="text/babel"></script>
+  <script src="../starters/device_frame.jsx" type="text/babel"></script>
+  <script src="../starters/animations.jsx" type="text/babel"></script>
+  <style>
+    body { margin: 0; font-family: system-ui, sans-serif; background: #fafaf9; }
+    .screen-body { padding: 60px 28px; }
+    .pill { display: inline-block; padding: 8px 16px; border-radius: 999px; background: #f4f4f4; font-size: 14px; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+
+    function SmokeScreen({ label }) {
+      const t = useTime();
+      const opacity = interpolate(t, [0, 400], [0, 1], { easing: Easing.outQuart });
+      return (
+        <div className="screen-body" style={{opacity}}>
+          <div className="pill">Smoke test</div>
+          <h2 style={{margin: 0, fontSize: 28}}>{label}</h2>
+          <p style={{color: '#666', marginTop: 12}}>Animated fade-in on mount. useTime and interpolate should work.</p>
+        </div>
+      );
+    }
+
+    function App() {
+      return (
+        <DesignCanvas columns={2} label="Device frames smoke test">
+          <DesignCanvas.Cell label="iOS">
+            <DeviceFrame kind="ios">
+              <SmokeScreen label="iPhone 15 Pro"/>
+            </DeviceFrame>
+          </DesignCanvas.Cell>
+          <DesignCanvas.Cell label="Android">
+            <DeviceFrame kind="android">
+              <SmokeScreen label="Pixel 8"/>
+            </DeviceFrame>
+          </DesignCanvas.Cell>
+          <DesignCanvas.Cell label="macOS window">
+            <DeviceFrame kind="mac" title="My App">
+              <SmokeScreen label="Desktop app"/>
+            </DeviceFrame>
+          </DesignCanvas.Cell>
+          <DesignCanvas.Cell label="Browser">
+            <DeviceFrame kind="browser" title="Claude" url="claude.com/new">
+              <SmokeScreen label="Web app"/>
+            </DeviceFrame>
+          </DesignCanvas.Cell>
+        </DesignCanvas>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+  </script>
+</body>
+</html>

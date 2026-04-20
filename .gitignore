@@ -1,0 +1,64 @@
+# Dependencies
+node_modules/
+
+# User work — not part of the tool itself
+artifacts/
+handoff/
+examples/
+assets/thumbs/
+assets.html
+design-assets.json
+dist/
+
+# Generated state from /done, /verify-artifact, /make-tweakable
+.claude/last-preview.png
+.claude/last-snapshot.json
+.claude/verify-*.png
+.claude/design-tokens.json
+.claude/.serve.pid
+.claude/answers.json
+
+# Tweaks session state (contains per-session yaml)
+# (artifacts/tweaks/ is already covered by artifacts/)
+
+# Build / export products
+*.pptx
+*.pdf
+*-standalone.html
+
+# Local project settings (may contain user-specific paths/permissions)
+.claude/settings.local.json
+
+# OS / editor
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Env / secrets
+.env
+.env.*
+*.pem
+*.key
+credentials*
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temp
+/tmp/
+*.tmp
+
+# Plan scratch (user-local)
+/Users/*/\.claude/plans/*.md
+
+# Source spec reference (not redistributed)
+claude-design-system.md
