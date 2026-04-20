@@ -13,11 +13,44 @@ Deeper check than `/done` — uses vision on the actual rendering and flags visu
 
 1. **Ensure preview is live:** if `$0` isn't already open in Chrome DevTools MCP, navigate there first via `/preview $0`.
 
-2. **Take a fresh screenshot** to a timestamped path:
+2. **Deck-aware pre-check (if `<deck-stage>` present).** Decks have `overflow: hidden` on sections — vertical overflow is visually silent, so vision alone will miss it. Run the programmatic audit FIRST:
+
+   ```js
+   // mcp__chrome-devtools__evaluate_script
+   async () => {
+     const stage = document.querySelector('deck-stage');
+     if (!stage) return { isDeck: false };
+     const out = [];
+     for (let i = 0; i < stage.totalSlides; i++) {
+       stage.goToSlide(i);
+       await new Promise(r => setTimeout(r, 80));
+       const s = stage.querySelectorAll('section')[i];
+       const sRect = s.getBoundingClientRect();
+       const scale = 1080 / sRect.height;
+       let maxBottom = 0;
+       for (const el of s.querySelectorAll('*')) {
+         const cs = getComputedStyle(el);
+         if (cs.position === 'absolute' || cs.position === 'fixed') continue;
+         const r = el.getBoundingClientRect();
+         const b = (r.bottom - sRect.top) * scale;
+         if (b > maxBottom) maxBottom = b;
+       }
+       out.push({ slide: i + 1, overflow: Math.round(maxBottom - 1080) });
+     }
+     stage.goToSlide(0);
+     return { isDeck: true, slides: out };
+   }
+   ```
+
+   Any `overflow > 0` is a **P0** (content is being silently clipped). Report the list of offending slides with pixel counts. Skip the rest of verify and tell Claude to fix them first.
+
+3. **Take a fresh screenshot** to a timestamped path:
    ```
    ts=$(Bash(date -u +%Y%m%dT%H%M%SZ))
    mcp__chrome-devtools__take_screenshot({ filePath: `.claude/verify-${ts}.png`, fullPage: true })
    ```
+
+   For decks that passed the overflow audit, also sample slides at positions `[0, mid, last]` and save as `.claude/verify-${ts}-slide-${n}.png` — vision-check each rather than just the current viewport.
 
 3. **Read the screenshot with vision:** use the `Read` tool on `.claude/verify-<ts>.png` — Claude is multimodal and will see the image as input.
 

@@ -110,12 +110,77 @@ Vocalize the system in one paragraph before writing slides.
    - Vary layout rhythm across slides (not all same template)
 4. Speaker notes: follow Phase 1.5 decision — don't ask again.
 
+### 3.1 Vertical budget — compute before you write (!)
+
+`<deck-stage>` sections have `overflow: hidden` — overflow is visually **silent**, content just disappears. You must budget vertically up front.
+
+Typical chrome layout on each slide consumes ~430px of the 1080 canvas:
+
+| Item | Reserved |
+|---|---|
+| Section padding top | 96px |
+| Chrome row (abs, but visual weight) | 24px |
+| Kicker margin-top + kicker | 44 + 22 = 66px |
+| `h2.section-title` (font-size 80–96px × 2 lines) | ~200px |
+| h2 margin-bottom | 36px |
+| Content grid margin-top | 16px |
+| Section padding bottom | 96px |
+| **Total reserved** | **~430px** |
+
+**Content budget: 1080 − 430 = ~650px.** Any primary card, row, or media container in the content area must fit inside this.
+
+Hard caps to keep you honest:
+- Primary card `min-height`: **≤ 500px**
+- Post-mock / deep-content column `min-height`: **≤ 620px**
+- Max 5 anatomy rows at ~110px each, or 4 at ~130px each
+- Short h2 (1 line, ≤ 60 chars) → 140px budget frees up; long h2 (2 lines) → use 200px
+- If you need taller content, drop the kicker or merge kicker+h2 on one line — don't let cards grow
+
+If a slide feels too busy — split it or cut content. Overflow is a design smell, not a typography problem.
+
+### 3.2 Russian / long-word hyphenation
+
+Set `hyphens: manual; -webkit-hyphens: manual;` on `<section>` to prevent browsers from inserting soft-hyphens mid-word (breaks long Russian words across lines in narrow columns).
+
 ## Phase 4 — Verify
 
 1. `/done artifacts/<slug>.html` — opens in browser, checks console, saves screenshot
 2. Fix any errors; re-run until clean
-3. Invoke `Skill: verify-artifact` silently in background (vision check on layout)
-4. Reference `.claude/last-preview.png` in end-of-turn summary
+3. **Mandatory programmatic overflow audit** (blocks end-of-turn if any slide overflows):
+
+   ```js
+   // Paste into mcp__chrome-devtools__evaluate_script
+   async () => {
+     const stage = document.querySelector('deck-stage');
+     if (!stage) return { skipped: 'no deck-stage' };
+     const out = [];
+     for (let i = 0; i < stage.totalSlides; i++) {
+       stage.goToSlide(i);
+       await new Promise(r => setTimeout(r, 80));
+       const s = stage.querySelectorAll('section')[i];
+       const sRect = s.getBoundingClientRect();
+       const scale = 1080 / sRect.height;
+       // Measure deepest in-flow content bottom (ignore abs-positioned decorations
+       // with negative top/bottom offsets like .glow).
+       let maxBottom = 0;
+       for (const el of s.querySelectorAll('*')) {
+         const style = getComputedStyle(el);
+         if (style.position === 'absolute' || style.position === 'fixed') continue;
+         const r = el.getBoundingClientRect();
+         const b = (r.bottom - sRect.top) * scale;
+         if (b > maxBottom) maxBottom = b;
+       }
+       out.push({ slide: i + 1, contentBottom: Math.round(maxBottom), overflow: Math.round(maxBottom - 1080) });
+     }
+     stage.goToSlide(0);
+     return out;
+   }
+   ```
+
+   Any slide with `overflow > 0` is broken. **Do not claim done** — shrink cards / fonts / padding until every slide reports `overflow ≤ 0`. Common fixes: reduce `min-height` on cards, shrink headline font, drop a row, merge kicker+title, tighten vertical gaps.
+
+4. Invoke `Skill: verify-artifact` silently in background (vision check on layout — it handles per-slide screenshots automatically when it detects `<deck-stage>`)
+5. Reference `.claude/last-preview.png` in end-of-turn summary
 
 ## Phase 5 — Offer next steps
 

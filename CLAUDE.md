@@ -181,6 +181,13 @@ Never claim "done" without:
 2. A vision check via `Skill: verify-artifact` (silent-on-pass)
 3. A reference to the screenshot at `.claude/last-preview.png` in the end-of-turn summary
 
+### Deck-specific gate (for `<deck-stage>` artifacts)
+
+Sections have `overflow: hidden` — vertical clipping is visually **silent**. Vision alone will miss it.
+**Mandatory** before end-of-turn on any deck: run the per-slide overflow audit via `mcp__chrome-devtools__evaluate_script` (snippet in `make-deck` Phase 4 / `verify-artifact` step 2). Every slide must report `overflow ≤ 0`. If any slide overflows, fix before shipping — common levers: reduce card `min-height`, shrink headline font, cut a row, tighten gaps.
+
+Budget to keep in mind while writing: **~650px of vertical content budget** after 96px top/bottom padding, kicker, and h2 section title on a standard layout. Primary cards should not `min-height` above ~500px.
+
 ## No server, stateless
 
 This toolset is file-based. No local servers. No `window.claude.complete()`. If an artifact needs "live AI", Claude edits the HTML directly between user turns on request.
