@@ -8,7 +8,9 @@ End-of-turn gate: make sure the artifact at `$0` opens cleanly, capture evidence
 
 ## Steps
 
-1. Run `/preview $0` (open in browser + navigate Chrome DevTools MCP).
+1. Run `/preview $0` (open in browser + navigate Chrome DevTools MCP). `/preview` automatically appends a `?v=<epoch>` cache-buster so the browser shows the latest on-disk HTML — if you've edited the file this turn, the new render loads; screenshots reflect current state.
+
+   If `/done` is called on a URL that's already loaded without running `/preview`, also do `mcp__chrome-devtools__navigate_page({type: "reload", ignoreCache: true})` as a fallback.
 
 2. Wait for readiness via `mcp__chrome-devtools__evaluate_script` with an async function that **actually awaits** fonts:
    ```js

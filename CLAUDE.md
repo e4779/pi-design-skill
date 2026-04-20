@@ -184,9 +184,19 @@ Never claim "done" without:
 ### Deck-specific gate (for `<deck-stage>` artifacts)
 
 Sections have `overflow: hidden` — vertical clipping is visually **silent**. Vision alone will miss it.
-**Mandatory** before end-of-turn on any deck: run the per-slide overflow audit via `mcp__chrome-devtools__evaluate_script` (snippet in `make-deck` Phase 4 / `verify-artifact` step 2). Every slide must report `overflow ≤ 0`. If any slide overflows, fix before shipping — common levers: reduce card `min-height`, shrink headline font, cut a row, tighten gaps.
+**Mandatory** before end-of-turn on any deck:
 
-Budget to keep in mind while writing: **~650px of vertical content budget** after 96px top/bottom padding, kicker, and h2 section title on a standard layout. Primary cards should not `min-height` above ~500px.
+1. **Hard-reload with cache-bust** (`ignoreCache: true`) — screenshots and measurements must reflect the current on-disk HTML, not a stale render from before your last `Edit`.
+2. **Run the per-slide audit** via `mcp__chrome-devtools__evaluate_script` (snippet in `make-deck` Phase 4 / `verify-artifact` step 2). Thresholds:
+   - `overflow > 0` → **FAIL**, content clipped. Fix before shipping.
+   - `headroom < 40px` → **WARN**, visually too tight (font-metric variance can clip). Aim for ≥ 60px.
+   - `OK` — ship.
+
+The audit filter skips `.glow`, `.chrome`, `[data-decorative]`, and non-interactive low-opacity elements — but **measures all real content including `position: absolute`** (footer rows, inter-card arrows, save-prompts often are absolute).
+
+Common fix levers: reduce card `min-height`, shrink headline font, cut a row, tighten gaps, merge kicker+title into one line.
+
+Budget while writing: **~650px of vertical content budget** after 96px top/bottom padding, kicker, and h2 section title on a standard layout. Primary cards should not `min-height` above ~500px.
 
 ## No server, stateless
 

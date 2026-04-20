@@ -146,13 +146,23 @@ Set `hyphens: manual; -webkit-hyphens: manual;` on `<section>` to prevent browse
 
 1. `/done artifacts/<slug>.html` — opens in browser, checks console, saves screenshot
 2. Fix any errors; re-run until clean
-3. **Mandatory programmatic overflow audit** (blocks end-of-turn if any slide overflows):
+3. **Mandatory programmatic overflow audit** (blocks end-of-turn if any slide overflows or is too tight):
 
    ```js
    // Paste into mcp__chrome-devtools__evaluate_script
    async () => {
      const stage = document.querySelector('deck-stage');
      if (!stage) return { skipped: 'no deck-stage' };
+     // Decoratives we deliberately ignore (bleed past section bounds by design):
+     // glow halos, hero backdrops, chrome overlays, anything flagged data-decorative.
+     const DECORATIVE = '.glow, .glow-2, .hero-glow, .chrome, [data-decorative], [aria-hidden="true"].backdrop';
+     const isDecorative = (el) => {
+       if (el.matches(DECORATIVE) || el.closest(DECORATIVE)) return true;
+       const cs = getComputedStyle(el);
+       // pointer-events:none + no text + low opacity → visual decoration, skip
+       if (cs.pointerEvents === 'none' && !el.textContent?.trim() && parseFloat(cs.opacity) < 1) return true;
+       return false;
+     };
      const out = [];
      for (let i = 0; i < stage.totalSlides; i++) {
        stage.goToSlide(i);
@@ -160,24 +170,36 @@ Set `hyphens: manual; -webkit-hyphens: manual;` on `<section>` to prevent browse
        const s = stage.querySelectorAll('section')[i];
        const sRect = s.getBoundingClientRect();
        const scale = 1080 / sRect.height;
-       // Measure deepest in-flow content bottom (ignore abs-positioned decorations
-       // with negative top/bottom offsets like .glow).
-       let maxBottom = 0;
+       // Measure ALL elements (including position:absolute like .arrow-between, .save-cta,
+       // .footer-row that ARE meaningful content) — only decoratives are skipped.
+       let maxBottom = 0, culprit = null;
        for (const el of s.querySelectorAll('*')) {
-         const style = getComputedStyle(el);
-         if (style.position === 'absolute' || style.position === 'fixed') continue;
+         if (isDecorative(el)) continue;
+         const cs = getComputedStyle(el);
+         if (cs.display === 'none' || cs.visibility === 'hidden') continue;
          const r = el.getBoundingClientRect();
+         if (r.height === 0 && r.width === 0) continue;
          const b = (r.bottom - sRect.top) * scale;
-         if (b > maxBottom) maxBottom = b;
+         if (b > maxBottom) { maxBottom = b; culprit = el.className?.toString?.().slice(0, 40) || el.tagName; }
        }
-       out.push({ slide: i + 1, contentBottom: Math.round(maxBottom), overflow: Math.round(maxBottom - 1080) });
+       const contentBottom = Math.round(maxBottom);
+       const overflow = contentBottom - 1080;
+       const headroom = 1080 - contentBottom;
+       const status = overflow > 0 ? 'FAIL' : headroom < 40 ? 'WARN' : 'OK';
+       out.push({ slide: i + 1, contentBottom, overflow, headroom, status, culprit });
      }
      stage.goToSlide(0);
      return out;
    }
    ```
 
-   Any slide with `overflow > 0` is broken. **Do not claim done** — shrink cards / fonts / padding until every slide reports `overflow ≤ 0`. Common fixes: reduce `min-height` on cards, shrink headline font, drop a row, merge kicker+title, tighten vertical gaps.
+   - `FAIL` (`overflow > 0`) — content clipped. **Do not claim done.** Shrink cards / fonts / padding, then re-run.
+   - `WARN` (`headroom < 40px`) — visually too close to the edge (any small font-metric variance clips). Aim for ≥ 60px headroom.
+   - `OK` — ship.
+
+   Common fixes: reduce `min-height` on cards, shrink headline font, drop a row, merge kicker+title, tighten vertical gaps.
+
+   > **If the browser shows an overflow that this script says doesn't exist**, hard-reload with cache-bust: `mcp__chrome-devtools__navigate_page({ type: "reload", ignoreCache: true })`. Most such disagreements come from a cached CSS state prior to your latest `Edit`.
 
 4. Invoke `Skill: verify-artifact` silently in background (vision check on layout — it handles per-slide screenshots automatically when it detects `<deck-stage>`)
 5. Reference `.claude/last-preview.png` in end-of-turn summary

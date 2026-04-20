@@ -13,13 +13,26 @@ Deeper check than `/done` — uses vision on the actual rendering and flags visu
 
 1. **Ensure preview is live:** if `$0` isn't already open in Chrome DevTools MCP, navigate there first via `/preview $0`.
 
-2. **Deck-aware pre-check (if `<deck-stage>` present).** Decks have `overflow: hidden` on sections — vertical overflow is visually silent, so vision alone will miss it. Run the programmatic audit FIRST:
+2. **Deck-aware pre-check (if `<deck-stage>` present).** Decks have `overflow: hidden` on sections — vertical overflow is visually silent, so vision alone will miss it. Before screenshot, also **hard-reload with cache-bust** to make sure the browser is rendering the current on-disk CSS, not a cached state from before the last edit:
+
+   ```js
+   mcp__chrome-devtools__navigate_page({ type: "reload", ignoreCache: true })
+   ```
+
+   Then run the programmatic audit:
 
    ```js
    // mcp__chrome-devtools__evaluate_script
    async () => {
      const stage = document.querySelector('deck-stage');
      if (!stage) return { isDeck: false };
+     const DECORATIVE = '.glow, .glow-2, .hero-glow, .chrome, [data-decorative], [aria-hidden="true"].backdrop';
+     const isDecorative = (el) => {
+       if (el.matches(DECORATIVE) || el.closest(DECORATIVE)) return true;
+       const cs = getComputedStyle(el);
+       if (cs.pointerEvents === 'none' && !el.textContent?.trim() && parseFloat(cs.opacity) < 1) return true;
+       return false;
+     };
      const out = [];
      for (let i = 0; i < stage.totalSlides; i++) {
        stage.goToSlide(i);
@@ -27,22 +40,31 @@ Deeper check than `/done` — uses vision on the actual rendering and flags visu
        const s = stage.querySelectorAll('section')[i];
        const sRect = s.getBoundingClientRect();
        const scale = 1080 / sRect.height;
-       let maxBottom = 0;
+       let maxBottom = 0, culprit = null;
        for (const el of s.querySelectorAll('*')) {
+         if (isDecorative(el)) continue;
          const cs = getComputedStyle(el);
-         if (cs.position === 'absolute' || cs.position === 'fixed') continue;
+         if (cs.display === 'none' || cs.visibility === 'hidden') continue;
          const r = el.getBoundingClientRect();
+         if (r.height === 0 && r.width === 0) continue;
          const b = (r.bottom - sRect.top) * scale;
-         if (b > maxBottom) maxBottom = b;
+         if (b > maxBottom) { maxBottom = b; culprit = el.className?.toString?.().slice(0, 40) || el.tagName; }
        }
-       out.push({ slide: i + 1, overflow: Math.round(maxBottom - 1080) });
+       const contentBottom = Math.round(maxBottom);
+       const overflow = contentBottom - 1080;
+       const headroom = 1080 - contentBottom;
+       const status = overflow > 0 ? 'FAIL' : headroom < 40 ? 'WARN' : 'OK';
+       out.push({ slide: i + 1, contentBottom, overflow, headroom, status, culprit });
      }
      stage.goToSlide(0);
      return { isDeck: true, slides: out };
    }
    ```
 
-   Any `overflow > 0` is a **P0** (content is being silently clipped). Report the list of offending slides with pixel counts. Skip the rest of verify and tell Claude to fix them first.
+   Severity:
+   - `FAIL` (`overflow > 0`) — **P0**. Content silently clipped. Report list of slides + culprit class; skip rest of verify, tell Claude to fix.
+   - `WARN` (`headroom < 40`) — **P1**. Visually tight against edge (font-metric variance can push over). Report as soft issue.
+   - `OK` — proceed.
 
 3. **Take a fresh screenshot** to a timestamped path:
    ```
