@@ -1,7 +1,7 @@
 ---
 name: copy-example
 description: Generate a working demo artifact on dummy content so the user can see a reference implementation. Use when user says "show me an example deck", "what does a prototype look like", "give me a starter", "I want to see an example of X". Generates live — not from a static gallery.
-argument-hint: <kind: deck|prototype|wireframe|animation|design-system>
+argument-hint: "<kind: deck|prototype|wireframe|animation|design-system>"
 allowed-tools: read write edit bash mcporter
 ---
 

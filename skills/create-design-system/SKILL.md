@@ -1,7 +1,7 @@
 ---
 name: create-design-system
 description: Extract or build a design system (tokens, components, style guide). Use for "design system", "style guide", "tokens", "UI kit".
-argument-hint: <source: codebase path, github URL, "from scratch">
+argument-hint: "<source: codebase path, github URL, \"from scratch\">"
 allowed-tools: read write edit bash mcporter
 ---
 
