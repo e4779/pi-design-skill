@@ -1,8 +1,31 @@
-# claude-code-design
+# claude-code-design (pi/mcporter fork)
 
-**Claude Design (by Anthropic Labs), reproduced for Claude Code CLI.** Same outputs — HTML decks, interactive prototypes, design systems, animated videos — through an agent in your terminal instead of a canvas-based web app.
+> 🍴 Fork of [bluzir/claude-code-design](https://github.com/bluzir/claude-code-design) adapted for [pi coding agent](https://pi.dev) with [mcporter](https://github.com/e4779/mcporter) MCP bridge.
 
-## Why this exists
+**Claude Design (by Anthropic Labs), reproduced for pi + Chrome DevTools MCP.** Same outputs — HTML decks, interactive prototypes, design systems, animated videos — through an agent in your terminal.
+
+## What's different from the original
+
+| Original (Claude Code) | This fork (pi + mcporter) |
+|---|---|
+| `mcp__chrome-devtools__*` tools | `chrome-devtools.*` via mcporter |
+| `Read`, `Edit`, `Write`, `Grep`, `Glob` | `read`, `edit`, `write`, `bash` |
+| Claude Code skill commands | Standard Agent Skills format |
+| — | **New:** `chrome-css` skill (getComputedStyles, getBoxModel, isVisible) |
+
+## Install
+
+```bash
+pi install git:github.com/e4779/claude-code-design.git
+```
+
+## Why this fork exists
+
+Models using Chrome DevTools MCP write 68% of their interactions as raw `evaluate_script` JavaScript — primarily to read computed CSS styles. This fork adds the `chrome-css` skill that wraps these patterns into clean, reusable calls. Plus full adaptation of the original 19 design skills for pi's tool ecosystem.
+
+---
+
+*Original README below:*
 
 [Claude Design](https://www.anthropic.com/news/claude-design-anthropic-labs) is Anthropic Labs' chat+canvas for producing polished designs. It lives on claude.ai.
 
