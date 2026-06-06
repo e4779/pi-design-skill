@@ -2,7 +2,7 @@
 name: register-asset
 description: Register a design artifact in design-assets.json, capture a thumbnail, and regenerate assets.html overview grid. Use when an artifact is ready for review, or user says "add to overview", "register", "track this".
 argument-hint: <html-path> [--asset "Name"] [--group Type|Colors|Spacing|Components|Brand] [--subtitle "..."] [--status needs-review|approved|changes-requested]
-allowed-tools: Read Write Edit Bash(mkdir:*) Bash(node:*) Bash(realpath:*) mcp__chrome-devtools__*
+allowed-tools: read write edit mcporter
 ---
 
 # Register Asset
@@ -21,43 +21,43 @@ From `$ARGUMENTS`:
 
 ## Steps
 
-1. **Capture thumbnail:**
-   - If `--auto` and `.claude/last-preview.png` exists: `Bash(cp .claude/last-preview.png assets/thumbs/<slug>-<ts>.png)` — reuse
-   - Otherwise: `/preview <html-path>` → wait 500ms → `mcp__chrome-devtools__take_screenshot` → save to `assets/thumbs/<slug>-<ts>.png` (`Bash(mkdir -p assets/thumbs)` first)
+1.*Capture thumbnail:**
+ - If `--auto` and `.claude/last-preview.png` exists: `` — reuse
+ - Otherwise: `/preview <html-path>` → wait 500ms → `mcporter ` → save to `assets/thumbs/<slug>-<ts>.png` (`` first)
 
-2. **Read existing `design-assets.json`:**
-   - If missing → create with `{"items": []}`
+2.*read existing `design-assets.json`:**
+ - If missing → create with `{"items": []}`
 
-3. **Upsert entry:**
-   - Key on (asset, path) pair
-   - If exists → update fields + thumbnail + bump `updated_at`
-   - If new → append
+3.*Upsert entry:**
+ - Key on (asset, path) pair
+ - If exists → update fields + thumbnail + bump `updated_at`
+ - If new → append
 
-   Schema:
-   ```json
-   {
-     "items": [
-       {
-         "asset": "Primary button",
-         "path": "artifacts/button.html",
-         "group": "Components",
-         "status": "approved",
-         "subtitle": "Filled variant with hover state",
-         "thumbnail": "assets/thumbs/button-20260420T120000Z.png",
-         "registered_at": "2026-04-20T12:00:00Z",
-         "updated_at": "2026-04-20T12:00:00Z"
-       }
-     ]
-   }
-   ```
+ Schema:
+ ```json
+ {
+ "items": [
+ {
+ "asset": "Primary button",
+ "path": "artifacts/button.html",
+ "group": "Components",
+ "status": "approved",
+ "subtitle": "Filled variant with hover state",
+ "thumbnail": "assets/thumbs/button-20260420T120000Z.png",
+ "registered_at": "2026-04-20T12:00:00Z",
+ "updated_at": "2026-04-20T12:00:00Z"
+ }
+ ]
+ }
+ ```
 
-4. **Write `design-assets.json`** with formatted JSON (2-space indent).
+4.*write `design-assets.json`** with formatted JSON (2-space indent).
 
-5. **Regenerate `assets.html`:**
-   - `Bash(node scripts/make-assets-index.mjs)` — see script below
-   - If user didn't run `/doctor` and node is missing, fall back to inline generation via `Write` tool with HTML template
+5.*Regenerate `assets.html`:**
+ - `` — see script below
+ - If user didn't run `/doctor` and node is missing, fall back to inline generation via `Write` tool with HTML template
 
-6. **Report:** "Registered `<asset>` in `<group>`. View at `assets.html`."
+6.*Report:** "Registered `<asset>` in `<group>`. View at `assets.html`."
 
 ## assets.html layout
 

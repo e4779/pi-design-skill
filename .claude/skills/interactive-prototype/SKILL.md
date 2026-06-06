@@ -2,7 +2,7 @@
 name: interactive-prototype
 description: Build a hi-fi clickable React prototype with realistic device chrome. Triggered by "prototype", "clickable", "app mockup", "interactive demo".
 argument-hint: <feature or app description>
-allowed-tools: Read Write Edit Glob Grep Bash(cp:*) Bash(open:*) Bash(mkdir:*) mcp__chrome-devtools__*
+allowed-tools: read write edit bash mcporter
 ---
 
 # Interactive Prototype
@@ -12,8 +12,8 @@ Build a working clickable prototype — not a static mockup. Uses React + Babel 
 ## Phase 0 — Context pre-flight (auto-detect, ONE question max)
 
 Before design questions, silently check for context:
-1. `Read .claude/design-tokens.json` if exists
-2. `Bash(ls ~/.claude/design-systems/ 2>/dev/null)` — if brief mentions a brand matching a folder name → auto-apply
+1. `read .claude/design-tokens.json` if exists
+2. `` — if brief mentions a brand matching a folder name → auto-apply
 3. `Glob` for codebase tokens: `**/tailwind.config.*`, `**/theme.{ts,js,json}`, `**/tokens.{css,scss}`, `**/_variables.*`
 4. Scan brief for: github URL → `Skill: ingest-github`; Figma URL → `Skill: ingest-figma`; image attachment → `Skill: ingest-screenshot`; `.md`/`.pdf` → `Read`
 
@@ -43,39 +43,39 @@ Using context from Phase 0, commit to a mobile-aware system:
 ## Phase 3 — Build
 
 1. `artifacts/<slug>.html` with shell:
-   ```html
-   <!doctype html>
-   <html>
-   <head>
-     <meta charset="utf-8"/>
-     <title>{{name}}</title>
-     <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-     <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
-     <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
-     <script src="./device_frame.jsx" type="text/babel"></script>
-     <script src="./animations.jsx" type="text/babel"></script>
-     <style>body { margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #f4f4f6; }</style>
-   </head>
-   <body>
-     <div id="root"></div>
-     <script type="text/babel">
-       const { useState } = React;
-       // your components here
-       function App() {
-         const [screen, setScreen] = useState('home');
-         return <DeviceFrame kind="ios">
-           {screen === 'home' && <HomeScreen onNav={setScreen}/>}
-           {screen === 'detail' && <DetailScreen onBack={() => setScreen('home')}/>}
-         </DeviceFrame>;
-       }
-       ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
-     </script>
-   </body>
-   </html>
-   ```
-2. `Bash(cp starters/device_frame.jsx "$(dirname <html>)/")` + `Bash(cp starters/animations.jsx "$(dirname <html>)/")` — copy into the same dir as the HTML
+ ```html
+ <!doctype html>
+ <html>
+ <head>
+ <meta charset="utf-8"/>
+ <title>{{name}}</title>
+ <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+ <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+ <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+ <script src="./device_frame.jsx" type="text/babel"></script>
+ <script src="./animations.jsx" type="text/babel"></script>
+ <style>body { margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #f4f4f6; }</style>
+ </head>
+ <body>
+ <div id="root"></div>
+ <script type="text/babel">
+ const { useState } = React;
+ // your components here
+ function App() {
+ const [screen, setScreen] = useState('home');
+ return <DeviceFrame kind="ios">
+ {screen === 'home' && <HomeScreen onNav={setScreen}/>}
+ {screen === 'detail' && <DetailScreen onBack={() => setScreen('home')}/>}
+ </DeviceFrame>;
+ }
+ ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+ </script>
+ </body>
+ </html>
+ ```
+2. `/")` + `/")` — copy into the same dir as the HTML
 3. Navigation pattern: `useState` for current screen. For transitions use `<Transition>` from animations.jsx.
-4. **Critical React rule:** never `const styles = {...}`. Use component-prefixed names: `const headerStyles`, `const cardStyles`. Inline styles also OK.
+4.*Critical React rule:** never `const styles = {...}`. Use component-prefixed names: `const headerStyles`, `const cardStyles`. Inline styles also OK.
 5. Mock data inline; no external fetch.
 
 ## Phase 4 — Verify

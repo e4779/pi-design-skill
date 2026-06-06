@@ -2,7 +2,7 @@
 name: export-pptx
 description: Export an HTML deck to PPTX via per-slide screenshots. Requires Node + pptxgenjs + puppeteer (run /doctor first).
 argument-hint: <deck.html> [output.pptx]
-allowed-tools: Read Write Bash(node:*) Bash(realpath:*) Bash(mkdir:*) Bash(which:*) Bash(stat:*) Bash(ls:*)
+allowed-tools: read write
 ---
 
 # Export PPTX
@@ -11,23 +11,23 @@ Screenshot-based PPTX export — each `<section>` inside `<deck-stage>` becomes 
 
 ## Preflight
 
-1. `Bash(which node)` — if missing, tell user to install Node 20+
+1. `` — if missing, tell user to install Node 20+
 2. Check `package.json` has `pptxgenjs` + `puppeteer` — if not, run:
-   ```
-   Bash(npm install -D pptxgenjs puppeteer)
-   ```
-   (or tell user to run `/doctor` first)
+ ```
+
+ ```
+ (or tell user to run `/doctor` first)
 
 ## Steps
 
 1. Resolve paths:
-   - `$0` = deck HTML (required)
-   - `$1` = output (default: basename + `.pptx`)
+ - `$0` = deck HTML (required)
+ - `$1` = output (default: basename + `.pptx`)
 
 2. Run the export script:
-   ```
-   Bash(node scripts/export-pptx.mjs "<input>" "<output>")
-   ```
+ ```
+
+ ```
 
 3. Report size + path.
 

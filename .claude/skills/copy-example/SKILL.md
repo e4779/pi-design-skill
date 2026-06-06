@@ -2,7 +2,7 @@
 name: copy-example
 description: Generate a working demo artifact on dummy content so the user can see a reference implementation. Use when user says "show me an example deck", "what does a prototype look like", "give me a starter", "I want to see an example of X". Generates live — not from a static gallery.
 argument-hint: <kind: deck|prototype|wireframe|animation|design-system>
-allowed-tools: Read Write Edit Glob Grep Bash(cp:*) Bash(mkdir:*) Bash(open:*) mcp__chrome-devtools__*
+allowed-tools: read write edit bash mcporter
 ---
 
 # Copy Example
@@ -17,15 +17,15 @@ Unlike a static gallery (files pre-authored), this skill runs the actual workflo
 
 2. Pick a canned brief from the matrix below. Tell the user which one you're using so they can change it.
 
-3. Route to the matching workflow skill **bypassing Phase 0/1** (context pre-flight and ambiguity gate) — we're generating a demo, not gathering requirements. Pass the dummy brief plus these overrides:
-   - Use `frontend-design` for aesthetic (no brand context)
-   - Write under `examples/<kind>-<YYYYMMDD>/` instead of `artifacts/`
-   - Skip register-asset (demos shouldn't clutter `assets.html`)
+3. Route to the matching workflow skill*bypassing Phase 0/1** (context pre-flight and ambiguity gate) — we're generating a demo, not gathering requirements. Pass the dummy brief plus these overrides:
+ - Use `frontend-design` for aesthetic (no brand context)
+ - write under `examples/<kind>-<YYYYMMDD>/` instead of `artifacts/`
+ - Skip register-asset (demos shouldn't clutter `assets.html`)
 
 4. After the workflow skill completes (including `/done` on the output), report:
-   - Path to the generated artifact
-   - URL the user can open (file:// or http://127.0.0.1:4567/...)
-   - Suggestion to `cp -r examples/<kind>-<ts>/ artifacts/my-<kind>/` and then iterate via the regular workflow skill
+ - Path to the generated artifact
+ - URL the user can open (file:// or http://127.0.0.1:4567/...)
+ - Suggestion to `cp -r examples/<kind>-<ts>/ artifacts/my-<kind>/` and then iterate via the regular workflow skill
 
 ## Canned briefs
 
@@ -39,7 +39,7 @@ Unlike a static gallery (files pre-authored), this skill runs the actual workflo
 
 ## Important
 
-- **Don't write to `artifacts/`** — examples belong in `examples/` to avoid polluting the user's real work
-- **Don't register as assets** — examples are reference material, not deliverables
-- **Tell the user explicitly** this is a generated example and invite them to iterate on a copy
+-*Don't write to `artifacts/`** — examples belong in `examples/` to avoid polluting the user's real work
+-*Don't register as assets** — examples are reference material, not deliverables
+-*Tell the user explicitly** this is a generated example and invite them to iterate on a copy
 - Regenerate fresh each time the skill is called — timestamps in the folder name keep old ones around if the user wants to compare

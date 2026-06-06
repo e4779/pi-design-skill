@@ -2,18 +2,18 @@
 name: animated-video
 description: Build animated motion design (explainer, transition reel, product intro). Uses Stage/Sprite timeline from animations.jsx for in-browser compositions or Remotion for full video/MP4 workflows.
 argument-hint: <what to animate>
-allowed-tools: Read Write Edit Bash(cp:*) Bash(open:*) Bash(mkdir:*) mcp__chrome-devtools__*
+allowed-tools: read write edit mcporter
 ---
 
 # Animated Video
 
-Two paths depending on complexity. **Decide first, tell the user which path you're taking.**
+Two paths depending on complexity.*Decide first, tell the user which path you're taking.**
 
 ## Phase 0 — Context pre-flight (auto-detect, ONE question max)
 
 Before deciding Path A vs B, silently check for context:
-1. `Read .claude/design-tokens.json` if exists
-2. `Bash(ls ~/.claude/design-systems/ 2>/dev/null)` — brand folder match
+1. `read .claude/design-tokens.json` if exists
+2. `` — brand folder match
 3. `Glob` codebase tokens
 4. Scan brief for github / Figma / image / PRD attachment → dispatch ingestion skills
 
@@ -35,39 +35,39 @@ Uses the Remotion-compatible in-browser engine in `starters/animations.jsx`. Sam
 | `useSprite()` | Returns local t ∈ [0,1] within the current Sprite. |
 | `Easing` | `linear`, `inQuad`, `outQuad`, `inOutCubic`, `outQuart`, `inOutExpo`, `spring(stiffness, damping)` |
 | `interpolate(t, [in], [out], { clamp?, easing? })` | Piecewise lerp. Supports numbers and hex colors. |
-| `<FadeIn>`, `<FadeOut>`, `<SlideIn from=...>`, `<ScaleIn from=...>`, `<Reveal from=...>` | Entry/exit sugar. **Persist after their animation window** (unlike Sprite). |
+| `<FadeIn>`, `<FadeOut>`, `<SlideIn from=...>`, `<ScaleIn from=...>`, `<Reveal from=...>` | Entry/exit sugar.*Persist after their animation window** (unlike Sprite). |
 | `<Transition from to duration>` | Standalone one-shot wrapper (no Stage needed). |
 
 **Steps:**
 
 1. Invoke `Skill: frontend-design` for aesthetic direction
 2. Create `artifacts/<slug>.html` with React + Babel + `animations.jsx`
-3. `Bash(cp starters/animations.jsx "$(dirname <html>)/")` — copy starter next to the HTML
+3. `/")` — copy starter next to the HTML
 4. Run `/serve` (required for external `.jsx` CORS)
 5. Compose the scene. Pattern:
 
 ```jsx
 function Scene() {
-  const t = useTime();  // Stage-shared clock
-  // drive properties via interpolate()
-  const bg = interpolate(t, [0, 2000, 5000], ['#fef9f3', '#f3d8a8', '#8a5a22'], { easing: Easing.inOutCubic });
-  return (
-    <div style={{ position: 'absolute', inset: 0, background: bg }}>
-      <FadeIn start={0} duration={500}>
-        <h1>Entry stays visible after 500ms</h1>
-      </FadeIn>
-      <Reveal start={400} duration={700} from="bottom" distance={40}>
-        <p>Fade + slide combo</p>
-      </Reveal>
-      <Sprite start={1500} end={3500} easing={Easing.outQuart}>
-        {(local) => <div style={{ opacity: local, transform: `scale(${local})` }}>Bounded — disappears after 3500</div>}
-      </Sprite>
-    </div>
-  );
+ const t = useTime(); // Stage-shared clock
+ // drive properties via interpolate()
+ const bg = interpolate(t, [0, 2000, 5000], ['#fef9f3', '#f3d8a8', '#8a5a22'], { easing: Easing.inOutCubic });
+ return (
+ <div style={{ position: 'absolute', inset: 0, background: bg }}>
+ <FadeIn start={0} duration={500}>
+ <h1>Entry stays visible after 500ms</h1>
+ </FadeIn>
+ <Reveal start={400} duration={700} from="bottom" distance={40}>
+ <p>Fade + slide combo</p>
+ </Reveal>
+ <Sprite start={1500} end={3500} easing={Easing.outQuart}>
+ {(local) => <div style={{ opacity: local, transform: `scale(${local})` }}>Bounded — disappears after 3500</div>}
+ </Sprite>
+ </div>
+ );
 }
 
 function App() {
-  return <Stage duration={5000} width={1920} height={1080} loop={false}><Scene/></Stage>;
+ return <Stage duration={5000} width={1920} height={1080} loop={false}><Scene/></Stage>;
 }
 ```
 

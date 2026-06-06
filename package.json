@@ -1,17 +1,13 @@
 {
-  "name": "claude-code-design",
+  "name": "claude-code-design-pi",
   "version": "1.0.0",
-  "main": "index.js",
-  "directories": {
-    "test": "test"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
+  "description": "Claude Design skills adapted for pi coding agent — HTML decks, prototypes, design systems, CSS inspection via Chrome DevTools MCP (mcporter)",
+  "keywords": ["pi-package", "design", "css", "chrome-devtools", "mcporter"],
+  "author": "bluzir (original), e4779 (pi adaptation)",
   "license": "ISC",
-  "description": "",
+  "pi": {
+    "skills": [".claude/skills"]
+  },
   "devDependencies": {
     "pptxgenjs": "^4.0.1",
     "puppeteer": "^24.41.0"
