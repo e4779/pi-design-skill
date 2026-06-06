@@ -6,7 +6,7 @@
   "author": "bluzir (original), e4779 (pi adaptation)",
   "license": "ISC",
   "pi": {
-    "skills": [".claude/skills"]
+    "skills": ["skills"]
   },
   "devDependencies": {
     "pptxgenjs": "^4.0.1",
