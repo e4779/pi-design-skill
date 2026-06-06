@@ -1,5 +1,5 @@
 {
-  "name": "pi-design",
+  "name": "pi-design-skill",
   "version": "1.0.0",
   "description": "Design skills for pi coding agent — HTML decks, prototypes, design systems, CSS inspection via Chrome DevTools MCP (mcporter)",
   "keywords": ["pi-package", "design", "css", "chrome-devtools", "mcporter"],

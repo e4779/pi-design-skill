@@ -1,4 +1,4 @@
-# pi-design
+# pi-design-skill
 
 > 🍴 Fork of [bluzir/claude-code-design](https://github.com/bluzir/claude-code-design) adapted for [pi coding agent](https://pi.dev) with [mcporter](https://github.com/e4779/mcporter) MCP bridge. Renamed to reflect it's now a standalone pi package, not tied to Claude Code.
 
@@ -16,7 +16,7 @@
 ## Install
 
 ```bash
-pi install git:github.com/e4779/pi-design.git
+pi install git:github.com/e4779/pi-design-skill.git
 ```
 
 ## Why this fork exists
