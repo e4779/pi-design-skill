@@ -1,6 +1,6 @@
-# claude-code-design (pi/mcporter fork)
+# pi-design
 
-> 🍴 Fork of [bluzir/claude-code-design](https://github.com/bluzir/claude-code-design) adapted for [pi coding agent](https://pi.dev) with [mcporter](https://github.com/e4779/mcporter) MCP bridge.
+> 🍴 Fork of [bluzir/claude-code-design](https://github.com/bluzir/claude-code-design) adapted for [pi coding agent](https://pi.dev) with [mcporter](https://github.com/e4779/mcporter) MCP bridge. Renamed to reflect it's now a standalone pi package, not tied to Claude Code.
 
 **Claude Design (by Anthropic Labs), reproduced for pi + Chrome DevTools MCP.** Same outputs — HTML decks, interactive prototypes, design systems, animated videos — through an agent in your terminal.
 
@@ -16,7 +16,7 @@
 ## Install
 
 ```bash
-pi install git:github.com/e4779/claude-code-design.git
+pi install git:github.com/e4779/pi-design.git
 ```
 
 ## Why this fork exists
